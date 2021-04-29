@@ -11,6 +11,7 @@ use Formwork\Utils\Interpolator\Nodes\IdentifierNode;
 use Formwork\Utils\Interpolator\Nodes\ImplicitArrayKeyNode;
 use Formwork\Utils\Interpolator\Nodes\NumberNode;
 use Formwork\Utils\Interpolator\Nodes\StringNode;
+use Closure;
 use InvalidArgumentException;
 
 class Interpolator
@@ -165,6 +166,11 @@ class Interpolator
                         is_object($value) ? 'class method, property or constant name' : 'array key'
                     ));
             }
+        }
+
+        // Call closures if arguments (zero or more) are given
+        if ($value instanceof Closure && $node->arguments() !== null) {
+            return $value(...$arguments);
         }
 
         return $value;
