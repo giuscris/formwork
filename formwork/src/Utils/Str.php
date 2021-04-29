@@ -173,7 +173,7 @@ class Str
     {
         return preg_replace_callback(
             self::INTERPOLATION_REGEX,
-            static function (array $matches) use ($vars): string {
+            static function (array $matches) use ($vars): ?string {
                 [$match, $escape, $value] = $matches;
                 if ($escape !== '') {
                     return substr($match, 1);
