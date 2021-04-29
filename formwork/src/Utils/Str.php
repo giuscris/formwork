@@ -2,6 +2,8 @@
 
 namespace Formwork\Utils;
 
+use Formwork\Utils\Interpolator\Interpolator;
+
 class Str
 {
     /**
@@ -12,6 +14,13 @@ class Str
     protected const SLUG_TRANSLATE_MAP = [
         '\t' => '', '\r' => '', '!' => '', '"' => '', '#' => '', '$' => '', '%' => '', '\'' => '-', '(' => '', ')' => '', '*' => '', '+' => '', ',' => '', '.' => '', ':' => '', ';' => '', '<' => '', '=' => '', '>' => '', '?' => '', '@' => '', '[' => '', ']' => '', '^' => '', '`' => '', '{' => '', '|' => '', '}' => '', '¡' => '', '£' => '', '¤' => '', '¥' => '', '¦' => '', '§' => '', '«' => '', '°' => '', '»' => '', '‘' => '', '’' => '', '“' => '', '”' => '', '\n' => '-', ' ' => '-', '-' => '-', '–' => '-', '—' => '-', '/' => '-', '\\' => '-', '_' => '-', '~' => '-', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A', 'Å' => 'A', 'Æ' => 'Ae', 'Ç' => 'C', 'Ð' => 'D', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ñ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'O', 'Ø' => 'O', 'Œ' => 'Oe', 'Š' => 'S', 'Þ' => 'Th', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'U', 'Ý' => 'Y', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'ae', 'å' => 'a', 'æ' => 'ae', '¢' => 'c', 'ç' => 'c', 'ð' => 'd', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ñ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'oe', 'ø' => 'o', 'œ' => 'oe', 'š' => 's', 'ß' => 'ss', 'þ' => 'th', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'ue', 'ý' => 'y', 'ÿ' => 'y', 'Ÿ' => 'y'
     ];
+
+    /**
+     * Regex used to interpolate values in strings
+     *
+     * @var string
+     */
+    protected const INTERPOLATION_REGEX = '/(\\\\?)\$\{((?:[^{}\\\\]|\\\\.)*)\}/';
 
     /**
      * Return whether $haystack string starts with $needle
@@ -155,5 +164,24 @@ class Str
     public static function removeEnd(string $haystack, string $needle): string
     {
         return static::endsWith($haystack, $needle) ? substr($haystack, 0, -strlen($needle)) : $haystack;
+    }
+
+    /**
+     * Interpolate variables from $vars array using `${variable}` syntax
+     */
+    public static function interpolate(string $string, array $vars): string
+    {
+        return preg_replace_callback(
+            self::INTERPOLATION_REGEX,
+            static function (array $matches) use ($vars): string {
+                [$match, $escape, $value] = $matches;
+                if ($escape !== '') {
+                    return substr($match, 1);
+                }
+                $value = str_replace(['\\{', '\\}'], ['{', '}'], html_entity_decode($value));
+                return Interpolator::interpolateString($value, $vars);
+            },
+            $string
+        );
     }
 }
