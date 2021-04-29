@@ -82,9 +82,9 @@ class Interpolator
     {
         $name = $node->value();
 
-        $traverse = $node->traverse();
-
         $arguments = [];
+
+        $traverse = $node->traverse();
 
         if ($node->arguments() !== null) {
             foreach ($node->arguments()->value() as $argument) {

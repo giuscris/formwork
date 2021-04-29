@@ -61,6 +61,10 @@ class Parser
 
         $arguments = null;
 
+        if ($this->stream->current()->test(Token::TYPE_PUNCTUATION, '(')) {
+            $arguments = $this->parseArguments();
+        }
+
         if ($this->stream->current()->test(Token::TYPE_PUNCTUATION, '.')) {
             $traverse = $this->parseDotNotation();
         }
@@ -69,11 +73,7 @@ class Parser
             $traverse = $this->parseBracketsNotation();
         }
 
-        if ($this->stream->current()->test(Token::TYPE_PUNCTUATION, '(')) {
-            $arguments = $this->parseArguments();
-        }
-
-        return new IdentifierNode($token->value(), $traverse, $arguments);
+        return new IdentifierNode($token->value(), $arguments, $traverse);
     }
 
     protected function parseNumberToken(): NumberNode

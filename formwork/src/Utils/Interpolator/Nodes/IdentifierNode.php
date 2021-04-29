@@ -10,32 +10,24 @@ class IdentifierNode extends AbstractNode
     public const TYPE = 'identifier';
 
     /**
-     * Node used to traverse
-     *
-     * @var AbstractNode|null
-     */
-    protected $traverse;
-
-    /**
      * Node arguments
      *
      * @var ArgumentsNode|null
      */
     protected $arguments;
 
-    public function __construct(string $value, ?AbstractNode $traverse, ?ArgumentsNode $arguments)
+    /**
+     * Node used to traverse
+     *
+     * @var AbstractNode|null
+     */
+    protected $traverse;
+
+    public function __construct(string $value, ?ArgumentsNode $arguments, ?AbstractNode $traverse)
     {
         $this->value = $value;
-        $this->traverse = $traverse;
         $this->arguments = $arguments;
-    }
-
-    /**
-     * Return the node used to traverse
-     */
-    public function traverse(): ?AbstractNode
-    {
-        return $this->traverse;
+        $this->traverse = $traverse;
     }
 
     /**
@@ -44,5 +36,13 @@ class IdentifierNode extends AbstractNode
     public function arguments(): ?ArgumentsNode
     {
         return $this->arguments;
+    }
+
+    /**
+     * Return the node used to traverse
+     */
+    public function traverse(): ?AbstractNode
+    {
+        return $this->traverse;
     }
 }
